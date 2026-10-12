@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || ec
 BUNDLE_ID="${CODEX_APP_BUNDLE_ID:-com.openai.codex}"
 SESSIONS_DIR="${CODEX_SESSIONS_DIR:-${CODEX_HOME:-$HOME/.codex}/sessions}"
 DELAY="${CODEX_SEND_DELAY:-2.5}"
-CONFIRM_TIMEOUT="${CODEX_SEND_CONFIRM_TIMEOUT:-30}"
+CONFIRM_TIMEOUT="${CODEX_SEND_CONFIRM_TIMEOUT:-90}"
 WAIT=""
 NO_SEND=0
 QUIET=0
@@ -47,7 +47,8 @@ Output (default):
 Environment:
   CODEX_APP_BUNDLE_ID           App bundle id (default com.openai.codex)
   CODEX_HOME / CODEX_SESSIONS_DIR  Where session rollouts live (default ~/.codex/sessions)
-  CODEX_SEND_CONFIRM_TIMEOUT    Seconds to wait for submission to show up (default 30)
+  CODEX_SEND_CONFIRM_TIMEOUT    Seconds to wait for submission to show up (default 90;
+                                the app may buffer rollout writes for ~1 min)
 
 Exit codes: 0 ok, 1 error / not submitted, 2 wait timed out (thread keeps running)
 EOF
@@ -151,8 +152,9 @@ for ((i = 0; i < CONFIRM_TIMEOUT; i++)); do
   sleep 1
 done
 
-[[ -n "$FILE" ]] || die "no submission detected within ${CONFIRM_TIMEOUT}s. The prompt may still be
-prefilled in the app; press Return there, or retry with a longer --delay."
+[[ -n "$FILE" ]] || die "submission not confirmed within ${CONFIRM_TIMEOUT}s (tag $TAG).
+It may still have been sent: the app can buffer session writes. Check the Codex app
+before retrying to avoid duplicate work; if the prompt is only prefilled, press Return there."
 
 if [[ "$QUIET" == 1 ]]; then echo "$FILE"; else echo "SENT $TAG"; echo "SESSION $FILE"; fi
 

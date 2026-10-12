@@ -9,9 +9,9 @@ The conversation starts directly in the app, avoiding the session-sync delay
 that can occur with `codex exec`. Claude reads only the final reply instead of
 the full rollout, keeping transcript token use low, and reviews the actual diff.
 
-![Desktop illustration: Claude Code delegates a search debounce task to Codex, then reads the final summary and reviews the diff.](docs/images/desktop-demo.svg)
+![Real screenshots: Claude Code delegates a debounce task to the Codex desktop app, Codex implements and tests it, Claude reviews the diff](docs/images/desktop-real.png)
 
-*Illustration — sample conversations and test results, not a recorded run.*
+*Real run on a demo project. Sidebars cropped and a local path blurred.*
 
 ![Illustration: Claude Code writes a task, codex-app-send opens a Codex App conversation to implement it, and Claude reads the final summary and reviews git diff.](docs/images/overview.svg)
 
@@ -178,7 +178,7 @@ seconds for polling. A wait timeout does not cancel the task in the app.
 | `CODEX_HOME` | `$HOME/.codex` | Base directory for session lookup |
 | `CODEX_SESSIONS_DIR` | `$CODEX_HOME/sessions` | Explicit session directory; overrides `CODEX_HOME` |
 | `CODEX_SEND_DELAY` | `2.5` | Delay before Return; `--delay` overrides it |
-| `CODEX_SEND_CONFIRM_TIMEOUT` | `30` | Submission confirmation timeout in seconds |
+| `CODEX_SEND_CONFIRM_TIMEOUT` | `90` | Submission confirmation timeout in seconds; the App may buffer session writes |
 | `CODEX_RESULT_POLL_INTERVAL` | `5` | Seconds between result checks |
 
 ## Exit codes

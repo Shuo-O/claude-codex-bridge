@@ -9,9 +9,9 @@
 Claude 只读取最终回复，不读取完整 rollout，从而减少对话记录带来的 token 消耗，
 并通过实际 diff 审查改动。
 
-![桌面效果示意：Claude Code 派发搜索防抖任务，Codex 在新对话中实现并测试，Claude 读取最终总结并审查 diff。](docs/images/desktop-demo.zh-CN.svg)
+![真实截图：Claude Code 将防抖任务派发给 Codex 桌面 App，Codex 实现并测试，Claude 审查 diff](docs/images/desktop-real.png)
 
-*示意图（Illustration）——对话及测试结果为示例，并非真实运行记录。*
+*在演示项目中的真实运行。侧边栏已裁剪，一处本地路径已模糊处理。*
 
 ![流程示意（illustration）：Claude Code 编写任务，codex-app-send 在 Codex App 中创建对话并执行，Claude 仅读取最终总结并审查 git diff。](docs/images/overview.svg)
 
@@ -171,7 +171,7 @@ codex-app-result /path/to/rollout.jsonl
 | `CODEX_HOME` | `$HOME/.codex` | 会话查找的基础目录 |
 | `CODEX_SESSIONS_DIR` | `$CODEX_HOME/sessions` | 显式指定会话目录，优先于 `CODEX_HOME` |
 | `CODEX_SEND_DELAY` | `2.5` | 按回车前的延迟，`--delay` 可覆盖 |
-| `CODEX_SEND_CONFIRM_TIMEOUT` | `30` | 提交确认超时，单位秒 |
+| `CODEX_SEND_CONFIRM_TIMEOUT` | `90` | 提交确认超时，单位秒；App 可能缓冲会话写入 |
 | `CODEX_RESULT_POLL_INTERVAL` | `5` | 两次结果检查之间的秒数 |
 
 ## 退出码
