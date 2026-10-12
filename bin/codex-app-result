@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# codex-app-result - print Codex's final message for a session rollout file.
+#
+# https://github.com/Shuo-O/claude-codex-bridge
+set -euo pipefail
+
+WAIT=0
+INTERVAL="${CODEX_RESULT_POLL_INTERVAL:-5}"
+
+usage() {
+  cat <<'EOF'
+Usage: codex-app-result [--wait SECONDS] <session.jsonl>
+
+Print the final agent message of the latest completed turn in a Codex
+session rollout file (as printed by codex-app-send).
+
+Options:
+  -w, --wait SECONDS  Poll until the turn completes, up to SECONDS
+  -h, --help          Show this help
+
+Exit codes: 0 printed, 1 error, 2 not completed yet / timed out
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -w|--wait) WAIT="${2:?--wait needs SECONDS}"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    --) shift; break ;;
+    -*) echo "codex-app-result: unknown option: $1" >&2; exit 1 ;;
+    *) break ;;
+  esac
+done
+
+[[ $# -eq 1 ]] || { usage >&2; exit 1; }
+FILE="$1"
+[[ -f "$FILE" ]] || { echo "codex-app-result: file not found: $FILE" >&2; exit 1; }
+
+# Prints the last_agent_message of the last task_complete event, provided no
+# newer turn has started since. Exit 2 when the latest turn is still running.
+read_final() {
+  python3 -I - "$FILE" <<'PY'
+import json, sys
+done, running = None, False
+with open(sys.argv[1], encoding="utf-8") as f:
+    for line in f:
+        try:
+            d = json.loads(line)
+        except ValueError:
+            continue
+        if d.get("type") != "event_msg":
+            continue
+        t = (d.get("payload") or {}).get("type")
+        if t == "task_started":
+            running = True
+        elif t == "task_complete":
+            running = False
+            done = (d.get("payload") or {}).get("last_agent_message") or ""
+if running or done is None:
+    sys.exit(2)
+print(done)
+PY
+}
+
+end=$(( $(date +%s) + WAIT ))
+while :; do
+  if read_final; then exit 0; else rc=$?; fi
+  [[ "$rc" -eq 2 ]] || exit "$rc"
+  if (( $(date +%s) >= end )); then
+    [[ "$WAIT" -gt 0 ]] && echo "codex-app-result: not finished after ${WAIT}s; the thread keeps running in the app" >&2
+    exit 2
+  fi
+  sleep "$INTERVAL"
+done
