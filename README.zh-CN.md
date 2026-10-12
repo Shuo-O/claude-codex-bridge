@@ -9,7 +9,40 @@
 Claude 只读取最终回复，不读取完整 rollout，从而减少对话记录带来的 token 消耗，
 并通过实际 diff 审查改动。
 
+![流程示意（illustration）：Claude Code 编写任务，codex-app-send 在 Codex App 中创建对话并执行，Claude 仅读取最终总结并审查 git diff。](docs/images/overview.svg)
+
+*示意图（illustration）——会话直接出现在 App 中，无需等待会话同步；
+只将最终回复回传给 Claude，降低 token 消耗，再结合 diff 审查。*
+
 ## 工作原理
+
+```mermaid
+sequenceDiagram
+    participant Claude as Claude Code
+    participant Send as codex-app-send
+    participant App as Codex App
+    participant Sessions as ~/.codex/sessions
+    participant Result as codex-app-result
+    Claude->>Send: 工作目录 + 任务（--wait 900）
+    Send->>App: 打开新对话，预填提示词 + 唯一标记
+    Send->>App: 短暂等待，确认前台后按回车
+    App->>Sessions: 记录提示词 + task_started
+    Send->>Sessions: 在最近的 rollout 中查找标记
+    Sessions-->>Send: 匹配的会话路径
+    Send-->>Claude: SENT 标记 + SESSION 路径
+    Send->>Result: 等待此会话的最终回复
+    par Codex 在 App 内执行
+        App->>App: 实现任务 + 运行测试
+        App->>Sessions: task_complete + last_agent_message
+    and 结果读取器等待
+        loop 轮询，直到最新一轮完成或超时
+            Result->>Sessions: 读取最新一轮状态
+            Sessions-->>Result: 完成状态 + 最终回复（若有）
+        end
+    end
+    Result-->>Claude: 完成后仅返回最终回复
+    Note over Claude,App: 共享工作区——Claude 审查 git diff 并验证改动
+```
 
 1. `codex-app-send` 为提示词追加唯一标记，通过
    `codex://threads/new?path=...&prompt=...` 创建对话并预填提示词。
@@ -19,6 +52,13 @@ Claude 只读取最终回复，不读取完整 rollout，从而减少对话记�
 4. 指定 `--wait` 时调用 `codex-app-result`，读取 `task_complete` 中的
    `last_agent_message`。如果此后又有 `task_started`，则等待新一轮完成，
    不会返回上一轮的旧回复。
+
+## 终端效果
+
+![终端示意（illustration）：codex-app-send --wait 900 ~/projects/my-app @task.md 输出 SENT、SESSION、FINAL，随后列出改动文件、测试通过数和风险。](docs/images/terminal-demo.svg)
+
+*示意图（illustration）——总结为示例，并非真实运行记录。会话路径已缩写，
+实际输出为绝对路径。12 项测试通过是示例任务的结果，不是本仓库的测试数量。*
 
 ## 要求
 

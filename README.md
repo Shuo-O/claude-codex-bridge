@@ -9,7 +9,40 @@ The conversation starts directly in the app, avoiding the session-sync delay
 that can occur with `codex exec`. Claude reads only the final reply instead of
 the full rollout, keeping transcript token use low, and reviews the actual diff.
 
+![Illustration: Claude Code writes a task, codex-app-send opens a Codex App conversation to implement it, and Claude reads the final summary and reviews git diff.](docs/images/overview.svg)
+
+*Illustration — conversations start directly in the app; only the final reply
+returns to Claude for review alongside the diff.*
+
 ## How it works
+
+```mermaid
+sequenceDiagram
+    participant Claude as Claude Code
+    participant Send as codex-app-send
+    participant App as Codex App
+    participant Sessions as ~/.codex/sessions
+    participant Result as codex-app-result
+    Claude->>Send: Workspace + task (--wait 900)
+    Send->>App: Open new thread with prompt + unique marker
+    Send->>App: After delay, check foreground and press Return
+    App->>Sessions: Record prompt + task_started
+    Send->>Sessions: Find marker in recent rollout
+    Sessions-->>Send: Matching session path
+    Send-->>Claude: SENT marker + SESSION path
+    Send->>Result: Wait for final reply in this session
+    par Codex works in the app
+        App->>App: Implement task + run tests
+        App->>Sessions: task_complete + last_agent_message
+    and Result reader waits
+        loop Poll until latest turn completes or timeout
+            Result->>Sessions: Read latest turn state
+            Sessions-->>Result: Completion state + final reply if available
+        end
+    end
+    Result-->>Claude: On completion, final reply only
+    Note over Claude,App: Shared checkout — Claude reviews git diff and verifies changes
+```
 
 1. `codex-app-send` adds a unique marker to the prompt and opens
    `codex://threads/new?path=...&prompt=...` to create a conversation with a
@@ -21,6 +54,14 @@ the full rollout, keeping transcript token use low, and reviews the actual diff.
 4. With `--wait`, it calls `codex-app-result`, which reads the final
    `last_agent_message` from `task_complete`. If a newer `task_started` exists,
    it waits for that turn instead of returning an old reply.
+
+## Terminal demo
+
+![Terminal illustration: codex-app-send --wait 900 ~/projects/my-app @task.md prints SENT, SESSION, and FINAL, followed by changed files, test counts, and a risk.](docs/images/terminal-demo.svg)
+
+*Illustration — sample summary, not a recorded run. The session path is
+abbreviated; actual output uses an absolute path. The 12 passing tests belong
+to the example task, not this repository's test suite.*
 
 ## Requirements
 

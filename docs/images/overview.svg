@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="490" viewBox="0 0 1060 490" role="img" aria-labelledby="title desc">
+  <title id="title">Claude Code to Codex App workflow — illustration</title>
+  <desc id="desc">Claude Code writes a task. codex-app-send opens a conversation directly in the Codex desktop app, which implements and tests it. Only the final summary returns to Claude, which reviews the shared git diff. No session-sync delay; less transcript token use.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#7b8ba5"/>
+    </marker>
+  </defs>
+  <rect width="1060" height="490" rx="20" fill="#101827"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="32" y="38" font-size="14" font-weight="700" letter-spacing="2" fill="#b4c4dd">CLAUDE–CODEX BRIDGE / ILLUSTRATION</text>
+    <text x="32" y="82" font-size="34" font-weight="700" fill="#f4f7fc">Delegate. Build in the app. Review the diff.</text>
+    <rect x="32" y="104" width="482" height="42" rx="12" fill="#183c3b"/>
+    <text x="50" y="132" font-size="20" font-weight="600" fill="#a6f0d6">App-native conversation · no session-sync delay</text>
+    <rect x="530" y="104" width="498" height="42" rx="12" fill="#253656"/>
+    <text x="548" y="132" font-size="20" font-weight="600" fill="#c5d9ff">Final reply only · low transcript token use</text>
+
+    <g fill="#1b2739" stroke="#41536e">
+      <rect x="32" y="172" width="304" height="122" rx="14"/>
+      <rect x="378" y="172" width="304" height="122" rx="14"/>
+      <rect x="724" y="172" width="304" height="122" rx="14" stroke="#72dabb"/>
+      <rect x="552" y="342" width="476" height="106" rx="14"/>
+      <rect x="32" y="342" width="476" height="106" rx="14"/>
+    </g>
+    <g stroke="#7b8ba5" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+      <path d="M 344 233 H 369"/>
+      <path d="M 690 233 H 715"/>
+      <path d="M 876 302 V 333"/>
+      <path d="M 544 395 H 517"/>
+    </g>
+    <g font-size="23" font-weight="700" fill="#f4f7fc">
+      <text x="52" y="208">1  Claude Code</text>
+      <text x="398" y="208">2  codex-app-send</text>
+      <text x="744" y="208">3  Codex desktop app</text>
+      <text x="572" y="378">4  Final summary → Claude</text>
+      <text x="52" y="378">5  Claude reviews git diff</text>
+    </g>
+    <g font-size="20" fill="#c2cee0">
+      <text x="52" y="244">Write a self-contained task</text>
+      <text x="52" y="272" font-family="monospace">@task.md</text>
+      <text x="398" y="244">Open thread + submit</text>
+      <text x="398" y="272" font-family="monospace">--wait 900</text>
+      <text x="744" y="244">New conversation in the app</text>
+      <text x="744" y="272">Implement + run tests</text>
+      <text x="572" y="414">Files changed · tests · risks</text>
+      <text x="52" y="414">Inspect shared files + verify the result</text>
+    </g>
+    <text x="530" y="476" text-anchor="middle" font-size="16" fill="#a9bad2">Shared checkout · Codex edits, then Claude reviews · no simultaneous edits</text>
+  </g>
+</svg>
