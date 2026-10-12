@@ -15,6 +15,8 @@ BUNDLE_ID="${CODEX_APP_BUNDLE_ID:-com.openai.codex}"
 SESSIONS_DIR="${CODEX_SESSIONS_DIR:-${CODEX_HOME:-$HOME/.codex}/sessions}"
 DELAY="${CODEX_SEND_DELAY:-2.5}"
 CONFIRM_TIMEOUT="${CODEX_SEND_CONFIRM_TIMEOUT:-90}"
+IDLE="${CODEX_SEND_IDLE:-1.5}"
+IDLE_MAX="${CODEX_SEND_IDLE_MAX:-15}"
 WAIT=""
 NO_SEND=0
 QUIET=0
@@ -49,6 +51,11 @@ Environment:
   CODEX_HOME / CODEX_SESSIONS_DIR  Where session rollouts live (default ~/.codex/sessions)
   CODEX_SEND_CONFIRM_TIMEOUT    Seconds to wait for submission to show up (default 90;
                                 the app may buffer rollout writes for ~1 min)
+  CODEX_SEND_IDLE               Keyboard pause required before sending (default 1.5 s)
+  CODEX_SEND_IDLE_MAX           Max seconds to wait for that pause (default 15)
+
+Typing guard: if you press a key between opening the thread and pressing Return,
+the prompt is left unsent (exit 1) so your typing is never submitted with it.
 
 Exit codes: 0 ok, 1 error / not submitted, 2 wait timed out (thread keeps running)
 EOF
@@ -100,6 +107,31 @@ import sys, urllib.parse as u
 print("codex://threads/new?" + u.urlencode({"path": sys.argv[1], "prompt": sys.argv[2]}, quote_via=u.quote))
 ' "$WORKSPACE" "$PROMPT")"
 
+# Seconds since the last physical key press (HID state, so our own synthetic
+# keystrokes do not count).
+key_idle() {
+  python3 -I -c '
+import ctypes, ctypes.util
+cg = ctypes.CDLL(ctypes.util.find_library("CoreGraphics"))
+f = cg.CGEventSourceSecondsSinceLastEventType
+f.restype = ctypes.c_double
+f.argtypes = [ctypes.c_int32, ctypes.c_uint32]
+print(f(1, 10))'
+}
+now() { python3 -I -c 'import time; print(time.time())'; }
+# True if the user pressed a key after the given timestamp.
+typed_since() { python3 -I -c 'import sys; sys.exit(0 if float(sys.argv[2]) < float(sys.argv[3]) - float(sys.argv[1]) else 1)' "$1" "$(key_idle)" "$(now)"; }
+
+# If the user is typing, wait for a short pause so their keystrokes do not land
+# in the new thread's composer and get sent along with the prompt.
+if [[ "$NO_SEND" == 0 ]]; then
+  for ((i = 0; i < IDLE_MAX * 4; i++)); do
+    python3 -I -c 'import sys; sys.exit(0 if float(sys.argv[1]) >= float(sys.argv[2]) else 1)' "$(key_idle)" "$IDLE" && break
+    sleep 0.25
+  done
+fi
+
+OPENED_AT="$(now)"
 open "$URL" || die "failed to open codex:// URL (is the Codex app installed?)"
 
 if [[ "$NO_SEND" == 1 ]]; then
@@ -108,6 +140,12 @@ if [[ "$NO_SEND" == 1 ]]; then
 fi
 
 sleep "$DELAY"
+
+if typed_since "$OPENED_AT"; then
+  die "not sent: a key was pressed while the new thread was opening, so the composer may
+contain your typing as well as the prompt. Check the new thread in the Codex app (tag $TAG)
+and send or discard it there."
+fi
 
 # Press Return only if the Codex app is frontmost, so a stray keystroke never
 # lands in another application.
@@ -143,10 +181,11 @@ retried=0
 for ((i = 0; i < CONFIRM_TIMEOUT; i++)); do
   FILE="$(find_session)"
   [[ -n "$FILE" ]] && break
-  # The composer may not have been focused yet; press Return once more.
-  # An extra Return on an empty composer is a no-op.
+  # The composer may not have been focused yet; press Return once more, but
+  # never if the user has typed since the thread opened: the first Return may
+  # have worked and they could be writing in the new thread.
   if [[ "$i" -eq 8 && "$retried" -eq 0 ]]; then
-    press_return >/dev/null 2>&1 || true
+    typed_since "$OPENED_AT" || press_return >/dev/null 2>&1 || true
     retried=1
   fi
   sleep 1

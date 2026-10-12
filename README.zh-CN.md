@@ -171,6 +171,8 @@ codex-app-result /path/to/rollout.jsonl
 | `CODEX_HOME` | `$HOME/.codex` | 会话查找的基础目录 |
 | `CODEX_SESSIONS_DIR` | `$CODEX_HOME/sessions` | 显式指定会话目录，优先于 `CODEX_HOME` |
 | `CODEX_SEND_DELAY` | `2.5` | 按回车前的延迟，`--delay` 可覆盖 |
+| `CODEX_SEND_IDLE` | `1.5` | 发送前打开新对话所需的键盘停顿秒数 |
+| `CODEX_SEND_IDLE_MAX` | `15` | 等待键盘停顿的最长时间，单位秒 |
 | `CODEX_SEND_CONFIRM_TIMEOUT` | `90` | 提交确认超时，单位秒；App 可能缓冲会话写入 |
 | `CODEX_RESULT_POLL_INTERVAL` | `5` | 两次结果检查之间的秒数 |
 
@@ -179,7 +181,7 @@ codex-app-result /path/to/rollout.jsonl
 | 退出码 | `codex-app-send` | `codex-app-result` |
 | --- | --- | --- |
 | `0` | 已提交，或通过 `-n` 预填；指定 `--wait` 时表示已返回回复 | 已返回最终回复 |
-| `1` | 出错或未确认提交 | 出错，包括文件不存在 |
+| `1` | 出错、未确认提交，或因检测到按键而未发送 | 出错，包括文件不存在 |
 | `2` | 等待最终回复超时，任务继续运行 | 最新一轮未完成，或等待超时 |
 
 轮询可能使实际等待超过指定时间，最多多出一个轮询间隔及文件读取时间。
@@ -198,6 +200,14 @@ Codex 工作时应避免同时编辑。
 
 ## 注意事项
 
+**按键保护：** 发送前，脚本等待键盘停顿 `CODEX_SEND_IDLE` 秒（默认 1.5 秒）
+再打开新对话；最多等待 `CODEX_SEND_IDLE_MAX` 秒（默认 15 秒，另加轮询开销），
+因此持续打字不会让脚本一直等下去。首次按回车前，如果检测到从打开新对话起
+有任何实体按键，脚本便不发送，以退出码 `1` 退出，提示你到 App 中检查新对话，
+自行发送或丢弃。等待提交确认约 8 秒后尝试补发的回车也受保护：检测到按键就
+跳过补发。检测使用 `CGEventSourceSecondsSinceLastEventType` 的 HID 状态，
+脚本自身模拟的按键不计入。
+
 - `codex://threads/new` 的参数来自 App 内部实现，**并非公开 API**，
   App 更新后可能失效。
 - 发送会短暂抢占前台焦点。只有确认 Codex App 位于前台时才会按回车，
@@ -213,7 +223,8 @@ bash tests/test.sh
 ```
 
 测试使用 Bash、系统标准工具及命令本身已有的 `python3` 依赖，无需测试框架。
-测试使用临时 fixture 和安装目录，只覆盖不会发送的参数路径，并拦截
+测试使用临时 fixture 和安装目录，覆盖不会发送的参数路径和使用键盘空闲时间桩的
+按键判断逻辑，并拦截
 `open` 与 `osascript`。CI 在 macOS 和 Ubuntu 上运行，不发送真实任务。
 
 ## 许可证与免责声明

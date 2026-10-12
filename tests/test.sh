@@ -81,6 +81,16 @@ check 'send rejects zero arguments' send_check 1 'Usage:'
 check 'send rejects one argument' send_check 1 'Usage:' "$TMP"
 check 'send rejects extra arguments' send_check 1 'Usage:' "$TMP" prompt extra
 
+# Extract only the helpers so typing detection can run without macOS APIs.
+eval "$(sed -n '/^now() /p; /^typed_since() /p' "$ROOT/bin/codex-app-send")"
+opened_at=$(python3 -I -c 'import sys; print(float(sys.argv[1]) - 1)' "$(now)")
+key_idle() { echo 0.2; }
+run typed_since "$opened_at"
+check 'typing after the thread opened is detected' test "$rc" -eq 0
+key_idle() { echo 30; }
+run typed_since "$opened_at"
+check 'typing before the thread opened is ignored' test "$rc" -eq 1
+
 run bash "$ROOT/install.sh" --help
 check 'installer help exits 0' test "$rc" -eq 0
 check 'installer help makes no changes' test ! -e "$PREFIX"

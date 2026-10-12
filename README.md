@@ -178,6 +178,8 @@ seconds for polling. A wait timeout does not cancel the task in the app.
 | `CODEX_HOME` | `$HOME/.codex` | Base directory for session lookup |
 | `CODEX_SESSIONS_DIR` | `$CODEX_HOME/sessions` | Explicit session directory; overrides `CODEX_HOME` |
 | `CODEX_SEND_DELAY` | `2.5` | Delay before Return; `--delay` overrides it |
+| `CODEX_SEND_IDLE` | `1.5` | Keyboard idle seconds required before opening a thread for sending |
+| `CODEX_SEND_IDLE_MAX` | `15` | Maximum wait for that keyboard pause, in seconds |
 | `CODEX_SEND_CONFIRM_TIMEOUT` | `90` | Submission confirmation timeout in seconds; the App may buffer session writes |
 | `CODEX_RESULT_POLL_INTERVAL` | `5` | Seconds between result checks |
 
@@ -186,7 +188,7 @@ seconds for polling. A wait timeout does not cancel the task in the app.
 | Code | `codex-app-send` | `codex-app-result` |
 | --- | --- | --- |
 | `0` | Submitted, or prefilled with `-n`; with `--wait`, reply returned | Final reply returned |
-| `1` | Error or submission not confirmed | Error, including a missing file |
+| `1` | Error, submission not confirmed, or left unsent because typing was detected | Error, including a missing file |
 | `2` | Final-reply wait timed out; task continues | Latest turn incomplete, or wait timed out |
 
 Polling can exceed the requested wait by up to a polling interval plus file
@@ -207,6 +209,16 @@ Both agents share the checkout: avoid simultaneous edits while Codex is working.
 
 ## Caveats
 
+**Typing guard:** Before opening a thread for sending, the script waits for a
+keyboard pause of `CODEX_SEND_IDLE` seconds (default 1.5). The wait is bounded by
+`CODEX_SEND_IDLE_MAX` (default 15 seconds, plus polling overhead), so continuous
+typing cannot hold it indefinitely. Before the first Return, any physical key
+press detected since opening the thread leaves the prompt unsent with exit `1`;
+check the new thread in the app and send or discard it yourself. The extra Return
+attempt after about 8 seconds without submission confirmation is also skipped
+if typing is detected. Detection uses `CGEventSourceSecondsSinceLastEventType`
+with HID state, so the script's own simulated keystrokes do not count.
+
 - The parameters of `codex://threads/new` come from the app's internal
   implementation, **not a public API**. App updates may break this bridge.
 - Sending briefly takes foreground focus. Return is pressed only after Codex
@@ -225,7 +237,8 @@ bash tests/test.sh
 
 The tests use Bash, standard system utilities, and the commands' existing
 `python3` dependency, with no test framework. They use temporary fixtures and
-installation directories, test only non-sending argument paths, and block
+installation directories, test non-sending argument paths and typing detection
+with a stubbed keyboard idle time, and block
 `open` and `osascript`. CI runs on macOS and Ubuntu; it does not send real tasks.
 
 ## License and disclaimer
