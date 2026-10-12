@@ -9,6 +9,10 @@ The conversation starts directly in the app, avoiding the session-sync delay
 that can occur with `codex exec`. Claude reads only the final reply instead of
 the full rollout, keeping transcript token use low, and reviews the actual diff.
 
+![Desktop illustration: Claude Code delegates a search debounce task to Codex, then reads the final summary and reviews the diff.](docs/images/desktop-demo.svg)
+
+*Illustration — sample conversations and test results, not a recorded run.*
+
 ![Illustration: Claude Code writes a task, codex-app-send opens a Codex App conversation to implement it, and Claude reads the final summary and reviews git diff.](docs/images/overview.svg)
 
 *Illustration — conversations start directly in the app; only the final reply
@@ -55,14 +59,6 @@ sequenceDiagram
    `last_agent_message` from `task_complete`. If a newer `task_started` exists,
    it waits for that turn instead of returning an old reply.
 
-## Terminal demo
-
-![Terminal illustration: codex-app-send --wait 900 ~/projects/my-app @task.md prints SENT, SESSION, and FINAL, followed by changed files, test counts, and a risk.](docs/images/terminal-demo.svg)
-
-*Illustration — sample summary, not a recorded run. The session path is
-abbreviated; actual output uses an absolute path. The 12 passing tests belong
-to the example task, not this repository's test suite.*
-
 ## Requirements
 
 - macOS for sending; the result reader also works on Linux.
@@ -76,6 +72,23 @@ If macOS shows an Automation permission prompt for controlling System Events,
 allow it as well.
 
 ## Installation
+
+### Install with AI
+
+Paste this prompt into Claude Code or Codex:
+
+```text
+Install https://github.com/Shuo-O/claude-codex-bridge for me:
+1. Check this is macOS and that the Codex desktop app and python3 are installed; stop and tell me if not.
+2. Clone the repo to ~/.local/share/claude-codex-bridge (or git pull if it already exists) and run ./install.sh there.
+3. Make sure ~/.local/bin is on my PATH; if not, tell me the exact line to add to my shell config instead of editing it yourself.
+4. Verify with: codex-app-send --version and codex-app-result --help, and confirm the skill exists at ~/.claude/skills/codex-app/SKILL.md.
+5. Do not change any system settings. Tell me that before the first real send I must allow the app running you (Terminal or Claude) under System Settings > Privacy & Security > Accessibility.
+6. Optionally, after I confirm, run a harmless test: codex-app-send -w 120 "$PWD" "Reply with OK only. Do not read or modify files."
+Report what you did and the verification output.
+```
+
+### Manual installation
 
 ```bash
 git clone https://github.com/Shuo-O/claude-codex-bridge.git
@@ -111,6 +124,14 @@ Uninstall removes command links pointing to this checkout and the whole
 installed `codex-app` skill directory; keep any skill edits elsewhere first.
 
 ## Usage
+
+### Terminal demo
+
+![Terminal illustration: codex-app-send --wait 900 ~/projects/my-app @task.md prints SENT, SESSION, and FINAL, followed by changed files, test counts, and a risk.](docs/images/terminal-demo.svg)
+
+*Illustration — sample summary, not a recorded run. The session path is
+abbreviated; actual output uses an absolute path. The 12 passing tests belong
+to the example task, not this repository's test suite.*
 
 Options must precede the workspace, which must be an existing absolute path.
 

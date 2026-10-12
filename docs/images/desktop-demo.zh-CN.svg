@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="840" viewBox="0 0 1360 840" role="img" aria-labelledby="title desc">
+  <title id="title">Claude Code 与 Codex 桌面协作示意</title>
+  <desc id="desc">macOS 桌面上并排的两个窗口：Claude 派发搜索防抖任务；Codex 编辑文件并通过 12 项示例测试；只回传最终总结，Claude 审查共享目录中的 diff。</desc>
+  <defs>
+    <linearGradient id="desktop" x2="1" y2="1">
+      <stop stop-color="#182c43"/>
+      <stop offset="1" stop-color="#324b59"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#a8e5d1"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #253544; }
+    .body { font-size: 20px; }
+    .label { font-size: 16px; font-weight: 650; fill: #526471; }
+    .mono { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 18px; }
+    .heading { font-size: 20px; font-weight: 650; }
+    .hero { font-size: 32px; font-weight: 700; fill: #f4f7fc; }
+    .muted { font-size: 18px; fill: #d1deea; }
+    .flow { font-size: 17px; font-weight: 650; fill: #b7efdc; }
+    .success { font-size: 20px; font-weight: 650; fill: #176047; }
+  </style>
+  <rect x="0" y="0" width="1360" height="840" rx="22" fill="url(#desktop)"/>
+  <rect x="0" y="0" width="1360" height="38" rx="22" fill="#162535"/>
+  <text x="28" y="25" class="label" style="fill:#d1deea">macOS</text>
+  <text x="1332" y="25" class="label" text-anchor="end" style="fill:#d1deea">Illustration</text>
+  <text x="32" y="89" class="hero" >在桌面 App 中实现，回到 Claude 审查</text>
+  <text x="32" y="122" class="muted" >共享项目目录  ·  ~/projects/my-app</text>
+  <rect x="32" y="154" width="548" height="594" rx="16" fill="#faf8f3" stroke="#a8b7c2"/>
+  <rect x="33" y="155" width="546" height="49" rx="15" fill="#eef0f1"/>
+  <path d="M 33 190 H 579 V 204 H 33 Z" fill="#eef0f1"/>
+  <circle cx="54" cy="179" r="6" fill="#ff6058"/>
+  <circle cx="76" cy="179" r="6" fill="#febc2e"/>
+  <circle cx="98" cy="179" r="6" fill="#29c840"/>
+  <text x="306" y="186" class="heading" text-anchor="middle">Claude Code</text>
+  <path d="M 33 204 H 579" stroke="#d5dce0"/>
+  <rect x="780" y="154" width="548" height="594" rx="16" fill="#ffffff" stroke="#a8b7c2"/>
+  <rect x="781" y="155" width="546" height="49" rx="15" fill="#eef0f1"/>
+  <path d="M 781 190 H 1327 V 204 H 781 Z" fill="#eef0f1"/>
+  <circle cx="802" cy="179" r="6" fill="#ff6058"/>
+  <circle cx="824" cy="179" r="6" fill="#febc2e"/>
+  <circle cx="846" cy="179" r="6" fill="#29c840"/>
+  <text x="1054" y="186" class="heading" text-anchor="middle">Codex</text>
+  <path d="M 781 204 H 1327" stroke="#d5dce0"/>
+  <text x="56" y="236" class="mono" style="fill:#62717d">~/projects/my-app</text>
+  <rect x="56" y="254" width="500" height="102" rx="12" fill="#eaeef2"/>
+  <text x="74" y="281" class="label" >用户</text>
+  <text x="74" y="310" class="body" >让 Codex 给搜索功能加上防抖，</text>
+  <text x="74" y="339" class="body" >并补测试。</text>
+  <text x="56" y="394" class="label" >CLAUDE</text>
+  <text x="56" y="424" class="body" >已将任务派发到 Codex App，</text>
+  <text x="56" y="453" class="body" >正在等待完成……</text>
+  <rect x="56" y="468" width="356" height="34" rx="8" fill="#e3e8ec"/>
+  <text x="68" y="491" class="mono" >codex-app-send --wait 900</text>
+  <path d="M 56 526 H 556" stroke="#d8dedf"/>
+  <text x="56" y="557" class="label" >CLAUDE</text>
+  <text x="56" y="588" class="body" >Codex 已完成。我审查了 git diff：</text>
+  <text x="56" y="621" class="mono" >src/search.ts</text>
+  <text x="56" y="648" class="mono" >tests/search.test.ts</text>
+  <text x="56" y="681" class="success" >12 项测试通过。</text>
+  <text x="56" y="714" class="body" >一处建议：手动确认搜索框的交互。</text>
+  <text x="804" y="237" class="heading" >my-app</text>
+  <text x="1304" y="237" class="label" text-anchor="end">新对话</text>
+  <rect x="804" y="254" width="500" height="132" rx="12" fill="#edf2f8"/>
+  <text x="822" y="282" class="label" >用户 · 来自 Claude</text>
+  <text x="822" y="311" class="body" >给搜索功能加上防抖，并补测试。</text>
+  <text x="822" y="364" class="mono" style="fill:#536b81">[ccb-…]</text>
+  <text x="804" y="422" class="label" >CODEX</text>
+  <rect x="804" y="439" width="500" height="145" rx="10" fill="#f4f7f7"/>
+  <text x="820" y="468" class="mono" >编辑  src/search.ts</text>
+  <text x="820" y="498" class="mono" >编辑  tests/search.test.ts</text>
+  <text x="820" y="528" class="mono" >运行  npm test</text>
+  <text x="820" y="563" class="success" >✓  12 passed</text>
+  <text x="804" y="617" class="label" >最终总结</text>
+  <text x="804" y="648" class="body" >已添加搜索防抖及测试。</text>
+  <text x="804" y="677" class="body" >修改 2 个文件；12 项测试通过。</text>
+  <text x="804" y="706" class="body" >尚未手动检查界面。</text>
+  <text x="680" y="311" class="flow" text-anchor="middle">① 派发任务</text>
+  <path d="M 591 333 H 767" stroke="#a8e5d1" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="680" y="583" class="flow" text-anchor="middle">② 只回传</text>
+  <text x="680" y="609" class="flow" text-anchor="middle">最终总结</text>
+  <path d="M 768 632 H 593" stroke="#a8e5d1" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="680" y="796" class="muted" text-anchor="middle">同一个项目目录，会话直接出现在 Codex App 中；Claude 只读最终总结和 diff。</text>
+</svg>

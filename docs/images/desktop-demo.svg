@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="840" viewBox="0 0 1360 840" role="img" aria-labelledby="title desc">
+  <title id="title">Claude Code and Codex desktop workflow — illustration</title>
+  <desc id="desc">Two windows on a macOS desktop: Claude delegates a search debounce task; Codex edits files and passes 12 example tests; only the final summary returns, and Claude reviews the shared diff.</desc>
+  <defs>
+    <linearGradient id="desktop" x2="1" y2="1">
+      <stop stop-color="#182c43"/>
+      <stop offset="1" stop-color="#324b59"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#a8e5d1"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #253544; }
+    .body { font-size: 20px; }
+    .label { font-size: 16px; font-weight: 650; fill: #526471; }
+    .mono { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 18px; }
+    .heading { font-size: 20px; font-weight: 650; }
+    .hero { font-size: 32px; font-weight: 700; fill: #f4f7fc; }
+    .muted { font-size: 18px; fill: #d1deea; }
+    .flow { font-size: 17px; font-weight: 650; fill: #b7efdc; }
+    .success { font-size: 20px; font-weight: 650; fill: #176047; }
+  </style>
+  <rect x="0" y="0" width="1360" height="840" rx="22" fill="url(#desktop)"/>
+  <rect x="0" y="0" width="1360" height="38" rx="22" fill="#162535"/>
+  <text x="28" y="25" class="label" style="fill:#d1deea">macOS</text>
+  <text x="1332" y="25" class="label" text-anchor="end" style="fill:#d1deea">Illustration</text>
+  <text x="32" y="89" class="hero" >Build in the desktop app. Bring the result back.</text>
+  <text x="32" y="122" class="muted" >Shared project directory  ·  ~/projects/my-app</text>
+  <rect x="32" y="154" width="548" height="594" rx="16" fill="#faf8f3" stroke="#a8b7c2"/>
+  <rect x="33" y="155" width="546" height="49" rx="15" fill="#eef0f1"/>
+  <path d="M 33 190 H 579 V 204 H 33 Z" fill="#eef0f1"/>
+  <circle cx="54" cy="179" r="6" fill="#ff6058"/>
+  <circle cx="76" cy="179" r="6" fill="#febc2e"/>
+  <circle cx="98" cy="179" r="6" fill="#29c840"/>
+  <text x="306" y="186" class="heading" text-anchor="middle">Claude Code</text>
+  <path d="M 33 204 H 579" stroke="#d5dce0"/>
+  <rect x="780" y="154" width="548" height="594" rx="16" fill="#ffffff" stroke="#a8b7c2"/>
+  <rect x="781" y="155" width="546" height="49" rx="15" fill="#eef0f1"/>
+  <path d="M 781 190 H 1327 V 204 H 781 Z" fill="#eef0f1"/>
+  <circle cx="802" cy="179" r="6" fill="#ff6058"/>
+  <circle cx="824" cy="179" r="6" fill="#febc2e"/>
+  <circle cx="846" cy="179" r="6" fill="#29c840"/>
+  <text x="1054" y="186" class="heading" text-anchor="middle">Codex</text>
+  <path d="M 781 204 H 1327" stroke="#d5dce0"/>
+  <text x="56" y="236" class="mono" style="fill:#62717d">~/projects/my-app</text>
+  <rect x="56" y="254" width="500" height="102" rx="12" fill="#eaeef2"/>
+  <text x="74" y="281" class="label" >YOU</text>
+  <text x="74" y="310" class="body" >Ask Codex to debounce search</text>
+  <text x="74" y="339" class="body" >and add tests.</text>
+  <text x="56" y="394" class="label" >CLAUDE</text>
+  <text x="56" y="424" class="body" >Sent the task to Codex App.</text>
+  <text x="56" y="453" class="body" >Waiting for completion…</text>
+  <rect x="56" y="468" width="356" height="34" rx="8" fill="#e3e8ec"/>
+  <text x="68" y="491" class="mono" >codex-app-send --wait 900</text>
+  <path d="M 56 526 H 556" stroke="#d8dedf"/>
+  <text x="56" y="557" class="label" >CLAUDE</text>
+  <text x="56" y="588" class="body" >Codex finished. I reviewed git diff:</text>
+  <text x="56" y="621" class="mono" >src/search.ts</text>
+  <text x="56" y="648" class="mono" >tests/search.test.ts</text>
+  <text x="56" y="681" class="success" >12 tests passed.</text>
+  <text x="56" y="714" class="body" >One suggestion: check the search UI.</text>
+  <text x="804" y="237" class="heading" >my-app</text>
+  <text x="1304" y="237" class="label" text-anchor="end">New conversation</text>
+  <rect x="804" y="254" width="500" height="132" rx="12" fill="#edf2f8"/>
+  <text x="822" y="282" class="label" >YOU · FROM CLAUDE</text>
+  <text x="822" y="311" class="body" >Add debounce to search and add tests.</text>
+  <text x="822" y="364" class="mono" style="fill:#536b81">[ccb-…]</text>
+  <text x="804" y="422" class="label" >CODEX</text>
+  <rect x="804" y="439" width="500" height="145" rx="10" fill="#f4f7f7"/>
+  <text x="820" y="468" class="mono" >Edit  src/search.ts</text>
+  <text x="820" y="498" class="mono" >Edit  tests/search.test.ts</text>
+  <text x="820" y="528" class="mono" >Run   npm test</text>
+  <text x="820" y="563" class="success" >✓  12 passed</text>
+  <text x="804" y="617" class="label" >FINAL SUMMARY</text>
+  <text x="804" y="648" class="body" >Added search debounce and tests.</text>
+  <text x="804" y="677" class="body" >Changed 2 files; 12 tests passed.</text>
+  <text x="804" y="706" class="body" >Manual UI check still pending.</text>
+  <text x="680" y="311" class="flow" text-anchor="middle">① Send task</text>
+  <path d="M 591 333 H 767" stroke="#a8e5d1" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="680" y="583" class="flow" text-anchor="middle">② Return only</text>
+  <text x="680" y="609" class="flow" text-anchor="middle">the final summary</text>
+  <path d="M 768 632 H 593" stroke="#a8e5d1" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="680" y="796" class="muted" text-anchor="middle">Same project directory. Conversation appears in Codex App; Claude reads only the final summary and diff.</text>
+</svg>

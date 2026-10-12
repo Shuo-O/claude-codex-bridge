@@ -9,6 +9,10 @@
 Claude 只读取最终回复，不读取完整 rollout，从而减少对话记录带来的 token 消耗，
 并通过实际 diff 审查改动。
 
+![桌面效果示意：Claude Code 派发搜索防抖任务，Codex 在新对话中实现并测试，Claude 读取最终总结并审查 diff。](docs/images/desktop-demo.zh-CN.svg)
+
+*示意图（Illustration）——对话及测试结果为示例，并非真实运行记录。*
+
 ![流程示意（illustration）：Claude Code 编写任务，codex-app-send 在 Codex App 中创建对话并执行，Claude 仅读取最终总结并审查 git diff。](docs/images/overview.svg)
 
 *示意图（illustration）——会话直接出现在 App 中，无需等待会话同步；
@@ -53,13 +57,6 @@ sequenceDiagram
    `last_agent_message`。如果此后又有 `task_started`，则等待新一轮完成，
    不会返回上一轮的旧回复。
 
-## 终端效果
-
-![终端示意（illustration）：codex-app-send --wait 900 ~/projects/my-app @task.md 输出 SENT、SESSION、FINAL，随后列出改动文件、测试通过数和风险。](docs/images/terminal-demo.svg)
-
-*示意图（illustration）——总结为示例，并非真实运行记录。会话路径已缩写，
-实际输出为绝对路径。12 项测试通过是示例任务的结果，不是本仓库的测试数量。*
-
 ## 要求
 
 - 发送需要 macOS；结果读取器也可在 Linux 上运行。
@@ -72,6 +69,23 @@ sequenceDiagram
 也需要允许。
 
 ## 安装
+
+### 让 AI 自动安装
+
+将下面的 prompt 粘贴给 Claude Code 或 Codex：
+
+```text
+请帮我安装 https://github.com/Shuo-O/claude-codex-bridge：
+1. 检查当前系统是否为 macOS，以及是否已安装 Codex 桌面 App 和 python3；如不满足，请停止并告诉我。
+2. 将仓库克隆到 ~/.local/share/claude-codex-bridge（如果已存在则执行 git pull），然后在该目录运行 ./install.sh。
+3. 确认 ~/.local/bin 在我的 PATH 中；如果不在，请告诉我应添加到 shell 配置中的确切内容，不要自行编辑配置。
+4. 执行 codex-app-send --version 和 codex-app-result --help 验证，并确认 ~/.claude/skills/codex-app/SKILL.md 存在。
+5. 不要更改任何系统设置。请提醒我：首次实际发送前，必须在“系统设置 > 隐私与安全性 > 辅助功能”中授权运行你的应用（终端或 Claude）。
+6. 可选：在我确认后，运行一个无害测试：codex-app-send -w 120 "$PWD" "Reply with OK only. Do not read or modify files."
+报告你执行的操作和验证输出。
+```
+
+### 手动安装
 
 ```bash
 git clone https://github.com/Shuo-O/claude-codex-bridge.git
@@ -104,6 +118,13 @@ PREFIX="$HOME/bin" CLAUDE_SKILLS_DIR="$HOME/.claude/skills" ./install.sh
 以及整个已安装的 `codex-app` skill 目录；如有自行修改，请先另存。
 
 ## 用法
+
+### 终端效果
+
+![终端示意（illustration）：codex-app-send --wait 900 ~/projects/my-app @task.md 输出 SENT、SESSION、FINAL，随后列出改动文件、测试通过数和风险。](docs/images/terminal-demo.svg)
+
+*示意图（illustration）——总结为示例，并非真实运行记录。会话路径已缩写，
+实际输出为绝对路径。12 项测试通过是示例任务的结果，不是本仓库的测试数量。*
 
 选项放在工作目录之前；工作目录必须是已存在的绝对路径。
 
